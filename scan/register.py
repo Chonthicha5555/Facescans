@@ -1,15 +1,17 @@
 import cv2
-import face_recognition
 import json
 
 # ฟังก์ชันสำหรับการลงทะเบียนผู้เข้าร่วม
 def register_attendee(name, frame):
-    face_encodings = face_recognition.face_encodings(frame)
-    if face_encodings:
-        face_encoding = face_encodings[0]
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+    if len(faces) > 0:
+        (x, y, w, h) = faces[0]
+        face_image = frame[y:y+h, x:x+w]
         user_data = {
             'name': name,
-            'face_encoding': face_encoding.tolist()
+            'face_image': face_image.tolist()  # บันทึกใบหน้าเป็นรูปภาพในรูปแบบ list
         }
         register_user(user_data)
         print(f"Registered {name} successfully!")
